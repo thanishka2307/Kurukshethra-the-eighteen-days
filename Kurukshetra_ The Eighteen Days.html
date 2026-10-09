@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kurukshetra: The Eighteen Days</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0}body{background:#0a0d1c;color:#f3ead2;font:17px/1.6 Georgia,"Times New Roman",serif;min-height:100vh}
+#cv{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+#a{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:6vh 14px 40px}
+.p{background:rgba(12,15,38,.8);backdrop-filter:blur(6px);border:1px solid #e0b04a66;border-radius:10px;padding:16px;animation:in .4s}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+h1{font-size:clamp(2rem,7vw,3.2rem);line-height:1.1;margin:.2em 0;letter-spacing:.04em;color:#ffe2a0;text-shadow:0 0 24px #e0b04a88}
+h2{margin:.3em 0;color:#ffe2a0}p{margin:.5em 0}
+button{font:inherit;color:#1a1204;background:linear-gradient(#ffd77a,#d9962e);border:0;border-radius:6px;padding:10px 16px;margin:4px 6px 4px 0;cursor:pointer;transition:transform .15s,box-shadow .15s}
+button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 18px #e0b04a66}
+button:disabled{opacity:.4;cursor:default}button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+button.o{display:block;width:100%;text-align:left;background:rgba(255,255,255,.06);color:#f3ead2;border:1px solid #e0b04a55;margin:8px 0}
+.g{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.c{background:rgba(12,15,38,.85);color:#f3ead2;border:1px solid var(--k);text-align:left;padding:12px;border-radius:10px;margin:0}
+.c:hover:not(:disabled){box-shadow:0 0 24px var(--k)}
+.m{color:#b9b3a0;font-size:.9rem}.l{min-height:3.2em;font-style:italic;color:#d8cfb4}.sp{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.d{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}.d i{width:13px;height:13px;border-radius:50%;border:1.5px solid #e0b04a}.d i.p{background:#e0b04a}.d i.n{background:#fff;box-shadow:0 0 10px #ffd77a}
+@media(prefers-reduced-motion:reduce){.p{animation:none}}
+</style></head><body><canvas id="cv"></canvas><main id="a"></main>
+<script>
+const R=n=>Math.floor(Math.random()*n),$=t=>{document.getElementById('a').innerHTML=t},cl=v=>Math.max(0,Math.min(100,v)),wt=ms=>new Promise(r=>setTimeout(r,ms));
+const H=[
+{n:'Arjuna',s:'P',c:'#4aa3ff',w:'b',hp:34,atk:6,a:['Pashupatastra',16,3],k:'gc',p:'Gandiva: Guard charges your astra twice as fast.'},
+{n:'Bhima',s:'P',c:'#e0703a',w:'m',hp:40,atk:6,a:['Gada Prahar',15,2],k:'rage',p:'Oath-rage: +3 attack when below half health.'},
+{n:'Abhimanyu',s:'P',c:'#4ad0a0',w:'b',hp:26,atk:8,a:['Chakra Breaker',14,2],k:'fear',f:2,ft:'You broke the ranks, but the Chakravyuha closed behind you. Alone, you fell on Day 13, and the war grew crueler.',p:'Fearless: +2 damage, but Guard blocks less. Fated to fall on Day 13.'},
+{n:'Bhishma',s:'K',c:'#e8e8f4',w:'b',hp:42,atk:7,a:['Vasava Astra',15,3],k:'lock',f:1,ft:'Pierced by countless arrows, you lie on a bed of them, choosing to wait for the sun\u2019s northward turn before you leave.',p:'Chosen death: survives his first fatal blow. Day 10 is a gauntlet of four duels. Vow: will not strike Shikhandi, unless you choose to break it.'},
+{n:'Karna',s:'K',c:'#f0c040',w:'b',hp:32,atk:8,a:['Vasavi Shakti',18,3],k:'curse',f:4,ft:'As your chariot wheel sinks, the curse comes due. Your loyalty to Duryodhana held to the last breath.',p:'No kavacha: takes 20% more damage. Curse may fizzle astras when hurt. Fated on Day 17.'},
+{n:'Duryodhana',s:'K',c:'#d8405a',w:'m',hp:38,atk:7,a:['Mace Fury',14,2],k:'mace',f:5,ft:'You leave the lake and face Bhima\u2019s mace on Day 18. The war ends where it began: in pride and grievance.',p:'Mace master: Strikes hit +2 harder. Fated on Day 18.'}];
+const CO={Bhishma:'#e8e8f4',Shikhandi:'#c580e0','Six Maharathis':'#c05a5a',Drona:'#e0b070',Karna:'#f0c040',Duryodhana:'#d8405a',Arjuna:'#4aa3ff',Abhimanyu:'#4ad0a0',Dhrishtadyumna:'#e06a6a',Bhima:'#e0703a',Satyaki:'#7ad0e0'};
+const GA=[['Satyaki',26,5],['Dhrishtadyumna',32,6],['Bhima',38,7],['Shikhandi',30,5]];
+const PR=[['Hastinapur','The blind king Dhritarashtra rules. His hundred sons, led by Duryodhana, and the five sons of Pandu grow up as rivals for the throne.'],['The Dice','Yudhishthira loses his kingdom, his brothers and Draupadi\u2019s honour at dice. The Pandavas are exiled for thirteen years.'],['The Return','The exile ends, but Duryodhana refuses even five villages. Krishna\u2019s peace mission fails.'],['The Secret','Kunti tells Karna he is her eldest son. He stays loyal to Duryodhana and promises to spare all her sons except Arjuna.'],['Sides Are Drawn','Krishna offers Arjuna his counsel, unarmed, and gives his army to Duryodhana. Eighteen akshauhinis gather at Kurukshetra.']];
+const CH=[
+[1,'Dharma Kshetra','Conches sound across the field. Kinsmen stand on both sides and doubt rises like dust. What do you hold to?',[['Seek counsel and honour the rules of war',10,0,4,0],['Cast doubt aside; only victory matters',-6,8,0,4]]],
+[10,'Ten Days of Attrition','Under the grandsire\u2019s command the armies grind each other down. A path to victory opens, but not an honourable one.',[['Fight on in the open, by the rules',8,4,3,0],['Use a loophole in his vow to break him',-8,2,6,6]]],
+[13,'The Chakravyuh','A spiral of warriors seals the field. Cut through and you may turn the day.',[['Press in alone and trust your courage',4,10,-3,0],['Regroup and call your allies before the breach',6,-2,8,4]]],
+[15,'A Teacher\u2019s Weakness','A rumour spreads that a son is dead. A great teacher lowers his weapon, grieving.',[['Refuse to strike a man who has laid down arms',12,-4,2,0],['Take the opening; the war will not wait',-12,8,0,6]]],
+[17,'The Sinking Wheel','Evening. A chariot wheel sinks into the earth and a bowman is briefly defenceless.',[['Honour the pause and let him lift it',12,-3,3,0],['Strike now, before he recovers',-12,10,-2,4]]],
+[18,'The Last Day','The last champions fall. A wounded king stands waist-deep in a lake, refusing to fight.',[['Grant honour to the fallen and mourn both sides',10,2,6,0],['Claim the victory and take all that remains',-10,6,-4,0]]]];
+const EP=['','Bhishma','Six Maharathis','Drona','Karna','Duryodhana'],EK=['','Arjuna','Abhimanyu','Dhrishtadyumna','Arjuna','Bhima'],ES=[0,[30,5],[38,6],[40,7],[46,8],[52,9]];
+const V=[['Krauncha (crane)','Restore 10 health'],['Garuda (eagle)','+2 attack this day'],['Sarpa (serpent)','Begin with 1 astra charge']];
+const IT={strike:'raises a blade',heavy:'gathers a crushing blow',guard:'takes a defensive stance'};
+const SKY=[[43,58,110,240,163,94],[50,88,150,246,207,138],[122,47,58,240,137,79],[74,42,94,232,115,90],[42,31,74,184,64,58],[15,20,48,90,42,74]],SY=[.03,.2,.16,.07,0,-.1];
+let s,h,k,b,Z,bt=0,gl=(k)=>k=='lock'&&s.c==1,hov=-1,shake=0,busy=0,VW,VH,DP,sc,gy,hz,tm=0,sy=0,sk=[43,58,110,240,163,94];
+const CV=document.getElementById('cv'),X=CV.getContext('2d'),PT=[],PJ=[],FL=[],FY=H.map(()=>({x:-300,y:0,s:.5})),
+ST=Array.from({length:70},()=>[Math.random(),Math.random()*.6,Math.random()*6]),EM=Array.from({length:50},()=>[Math.random(),Math.random(),.3+Math.random()]);
+let AC;function sfx(f,d,ty,g){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),v=AC.createGain(),n=AC.currentTime;o.type=ty||'sawtooth';o.frequency.setValueAtTime(f,n);o.frequency.exponentialRampToValueAtTime(f/3,n+d);v.gain.setValueAtTime(g||.06,n);v.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(v);v.connect(AC.destination);o.start();o.stop(n+d)}catch(e){}}
+function resize(){DP=Math.min(2,window.devicePixelRatio||1);VW=innerWidth;VH=innerHeight;CV.width=VW*DP;CV.height=VH*DP;X.setTransform(DP,0,0,DP,0,0);hz=VH*.38;gy=VH*.4;sc=Math.min(VH/430,VW/260)}
+const LK={Arjuna:{s:'#e0aa78',h:'#17141f',d:'crown',l:1},Bhima:{s:'#c98b5e',h:'#1a1410',d:'band',m:1,sp:1,w:1},Abhimanyu:{s:'#e8b88a',h:'#1a1420',d:'tiara',kn:1},Bhishma:{s:'#ecc9a6',h:'#f4f4fa',d:'none',b:'#f4f4fa',l:1},Karna:{s:'#e6aa5a',h:'#3a2410',d:'crown',e:1,l:1},Duryodhana:{s:'#cf8f62',h:'#150f12',d:'crown',m:1,w:1},Shikhandi:{s:'#e0b090',h:'#3a1a58',d:'band',l:1},Drona:{s:'#e2bc94',h:'#e8e8ee',d:'knot',b:'#e8e8ee'},Dhrishtadyumna:{s:'#d99c6e',h:'#1a1010',d:'crown'},Satyaki:{s:'#e0aa78',h:'#101820',d:'band',sp:1}},LD={s:'#d09c72',h:'#1a1210',d:'crown'};
+function fig(x,y,z,c,f,t,w,al,g,sh,n,sw,ra){const L=LK[n]||LD,O='#120c1c',G='#ffd24a',sz=n=='Abhimanyu'?.88:1,bo=Math.sin(t/260)*1.8,fl=Math.sin(t/300)*3,P=(fi,lw,st)=>{if(fi){X.fillStyle=fi;X.fill()}X.lineWidth=lw||2;X.strokeStyle=st||O;X.stroke()};sw=sw||0;ra=ra||0;
+X.save();X.globalAlpha=al;X.translate(x,y);X.scale(z*f*sz*(L.w?1.1:1),z*sz);X.lineJoin=X.lineCap='round';
+if(g){const q=X.createRadialGradient(0,-55,5,0,-55,85);q.addColorStop(0,c+'99');q.addColorStop(1,c+'00');X.fillStyle=q;X.fillRect(-95,-145,190,190)}
+const hy=-76+bo;
+if(n=='Karna'){X.fillStyle='#ffd24a33';X.beginPath();X.arc(-2,hy,36,0,7);X.fill();X.strokeStyle='#ffd24a99';X.lineWidth=3;X.stroke()}
+if(n=='Abhimanyu'){X.save();X.translate(-24,-54);X.rotate(t/220);X.strokeStyle=G;X.lineWidth=3;X.beginPath();X.arc(0,0,15,0,7);for(let i=0;i<6;i++){X.moveTo(0,0);X.lineTo(15*Math.cos(i*1.047),15*Math.sin(i*1.047))}X.stroke();X.restore()}
+const cg=X.createLinearGradient(0,-52,0,-2);cg.addColorStop(0,c);cg.addColorStop(1,c+'77');
+X.beginPath();X.moveTo(-8,-54+bo);X.quadraticCurveTo(-40-fl*2,-34,-34-fl*3,-2);X.quadraticCurveTo(-18,-12,-4,-14);X.closePath();P(cg);
+if(L.l){X.beginPath();X.moveTo(-14,hy-8);X.quadraticCurveTo(-36-fl,hy+8,-28-fl*2,hy+46+fl);X.quadraticCurveTo(-14,hy+38,-4,hy+16);X.closePath();P(L.h)}
+if(L.kn){X.beginPath();X.moveTo(-12,hy-14);X.quadraticCurveTo(-38-fl*2,hy-26,-32-fl,hy+14);X.quadraticCurveTo(-22,hy-4,-8,hy-6);X.closePath();P(L.h)}
+[-9,3].forEach(lx=>{X.beginPath();X.roundRect(lx,-24,8,22,3);P(L.s,1.8);X.beginPath();X.ellipse(lx+5,-1,8,3.2,0,0,7);P('#6a4326',1.8)});
+X.beginPath();X.moveTo(-15,-30);X.lineTo(15,-30);X.quadraticCurveTo(22,-16,19,-8);X.quadraticCurveTo(0,-3,-19,-8);X.quadraticCurveTo(-22,-16,-15,-30);P('#f6eed8');
+X.strokeStyle='#c9bfa0';X.lineWidth=1.2;X.beginPath();X.moveTo(-5,-28);X.lineTo(-7,-8);X.moveTo(5,-28);X.lineTo(7,-8);X.stroke();X.strokeStyle=G;X.lineWidth=2.5;X.beginPath();X.moveTo(-19,-8);X.quadraticCurveTo(0,-3,19,-8);X.stroke();
+X.beginPath();X.moveTo(-15,-54+bo);X.lineTo(15,-54+bo);X.lineTo(12,-28);X.lineTo(-12,-28);X.closePath();P(n=='Karna'?'#e8b030':c);
+X.fillStyle='rgba(0,0,0,.2)';X.beginPath();X.moveTo(4,-54+bo);X.lineTo(15,-54+bo);X.lineTo(12,-28);X.lineTo(4,-28);X.fill();
+X.strokeStyle=G;X.lineWidth=3;X.beginPath();X.moveTo(-12,-53+bo);X.lineTo(11,-31);X.stroke();
+X.beginPath();X.roundRect(-13,-33,26,5,2);P(G,1.5);
+X.beginPath();X.arc(0,-57+bo,10,.2,2.94);X.strokeStyle='#ff9a4a';X.lineWidth=3;X.stroke();
+[-15,15].forEach(px=>{X.beginPath();X.arc(px,-52+bo,6,0,7);P(G,1.5)});
+X.beginPath();X.roundRect(-4,-62+bo,8,9,3);P(L.s,1.5);
+X.beginPath();X.ellipse(-18,hy+1,3.5,5,0,0,7);P(L.s,1.8);
+if(L.e){X.beginPath();X.arc(-18,hy+9,3.5,0,7);P(G,1.5)}
+X.beginPath();X.ellipse(0,hy,18,19.5,0,0,7);P(L.s);X.fillStyle='rgba(255,255,255,.18)';X.beginPath();X.ellipse(-4,hy-8,10,6,0,0,7);X.fill();
+if(L.b){X.beginPath();X.moveTo(-14,hy+8);X.quadraticCurveTo(-10,hy+46,6,hy+42);X.quadraticCurveTo(20,hy+34,17,hy+8);X.quadraticCurveTo(8,hy+17,-14,hy+8);P(L.b)}
+X.beginPath();X.arc(0,hy-1,19.5,Math.PI*.98,Math.PI*2.02);X.quadraticCurveTo(10,hy-9,3,hy-7);X.quadraticCurveTo(-4,hy-14,-9,hy-6);X.quadraticCurveTo(-14,hy-4,-19.5,hy-1);P(L.h);
+if(L.sp){X.beginPath();[-10,0,10].forEach(i=>{X.moveTo(i-6,hy-17);X.lineTo(i+1,hy-30);X.lineTo(i+7,hy-17)});P(L.h,1.8)}
+if(L.d=='knot'||L.kn){X.beginPath();X.arc(-2,hy-24,8,0,7);P(L.h)}
+X.strokeStyle='rgba(255,255,255,.3)';X.lineWidth=2;X.beginPath();X.arc(0,hy-1,15,3.9,5);X.stroke();
+if(L.d=='crown'){X.beginPath();X.moveTo(-14,hy-13);X.lineTo(-14,hy-24);X.lineTo(-7,hy-18);X.lineTo(0,hy-33);X.lineTo(7,hy-18);X.lineTo(14,hy-24);X.lineTo(14,hy-13);X.closePath();P(G);X.fillStyle=c;X.beginPath();X.arc(0,hy-18,3.2,0,7);X.fill();X.fillStyle='#fff';X.fillRect(-1,hy-20,1.6,1.6)}
+if(L.d=='band'){X.beginPath();X.roundRect(-19,hy-12,38,5,2);P(c,1.8);X.fillStyle=G;X.beginPath();X.arc(0,hy-9.5,2.4,0,7);X.fill()}
+if(L.d=='tiara'){X.beginPath();X.moveTo(-6,hy-10);X.lineTo(0,hy-21);X.lineTo(6,hy-10);X.closePath();P(G,1.8)}
+const bl=t%3300<120?.5:5;
+[3,12].forEach(ex=>{X.beginPath();X.ellipse(ex,hy+2,4.6,bl,0,0,7);P('#fff',1.3);if(bl>2){X.fillStyle='#2a1608';X.beginPath();X.ellipse(ex+1,hy+2.5,3.2,4.2,0,0,7);X.fill();X.fillStyle='#fff';X.beginPath();X.arc(ex+2.2,hy+.8,1.3,0,7);X.fill()}X.strokeStyle=O;X.lineWidth=2.4;X.beginPath();X.ellipse(ex,hy+2,4.6,bl,0,Math.PI,6.283);X.stroke()});
+X.strokeStyle='rgba(30,18,12,.9)';X.lineWidth=2.8;X.beginPath();X.moveTo(-1,hy-7);X.lineTo(6,hy-4);X.moveTo(9,hy-4);X.lineTo(16,hy-7.5);X.stroke();
+X.strokeStyle='rgba(90,40,20,.6)';X.lineWidth=1.5;X.beginPath();X.moveTo(9,hy+8);X.lineTo(11,hy+10);X.lineTo(8.5,hy+10.5);X.stroke();
+X.fillStyle='#ff7a7a55';X.beginPath();X.arc(14,hy+9,3.2,0,7);X.fill();
+if(L.m){X.fillStyle=L.h;[[5,.25],[13,-.25]].forEach(m=>{X.beginPath();X.ellipse(m[0],hy+7,5,2.3,m[1],0,7);X.fill()})}
+if(sw>.3){X.beginPath();X.ellipse(9,hy+13,3.2,3.8,0,0,7);P('#7a1620',1.4)}else{X.strokeStyle='rgba(90,20,20,.9)';X.lineWidth=2;X.beginPath();X.arc(9,hy+9,4,.2,2.9);X.stroke()}
+const a=.5-sw*.6-ra*1.9,sx=11,sy=-50+bo,hx=sx+Math.cos(a)*22,hz2=sy+Math.sin(a)*22;
+X.strokeStyle=O;X.lineWidth=9;X.beginPath();X.moveTo(sx,sy);X.lineTo(hx,hz2);X.stroke();X.strokeStyle=L.s;X.lineWidth=5.5;X.stroke();
+X.fillStyle=G;X.beginPath();X.arc((sx+hx)/2+Math.cos(a)*3,(sy+hz2)/2+Math.sin(a)*3,4.2,0,7);X.fill();
+X.save();X.translate(hx,hz2);
+if(w=='m'){X.rotate(-1.25+sw*1.7-ra*.3);X.strokeStyle=O;X.lineWidth=7;X.beginPath();X.moveTo(-6,0);X.lineTo(38,0);X.stroke();X.strokeStyle='#8a5a2b';X.lineWidth=4;X.stroke();X.strokeStyle=G;X.lineWidth=2;for(let i=0;i<6;i++){X.beginPath();X.moveTo(44+11*Math.cos(i*1.047),11*Math.sin(i*1.047));X.lineTo(44+16*Math.cos(i*1.047),16*Math.sin(i*1.047));X.stroke()}X.beginPath();X.arc(44,0,11,0,7);P(G,2.5);X.fillStyle=c;X.beginPath();X.arc(44,0,5,0,7);X.fill()}
+else{X.rotate(-ra*.5+sw*.6);const e1=-16+34*Math.cos(1.15),e2=34*Math.sin(1.15);X.strokeStyle=O;X.lineWidth=6;X.beginPath();X.arc(-16,0,34,-1.15,1.15);X.stroke();X.strokeStyle=n=='Arjuna'?G:'#8a5a2b';X.lineWidth=3.5;X.stroke();X.strokeStyle='#fff';X.lineWidth=1;X.beginPath();X.moveTo(e1,-e2);X.lineTo(e1,e2);X.stroke();X.strokeStyle=c;X.lineWidth=2;X.beginPath();X.moveTo(-14,0);X.lineTo(30,0);X.stroke();X.fillStyle=c;X.beginPath();X.moveTo(30,-3.5);X.lineTo(38,0);X.lineTo(30,3.5);X.fill()}
+X.restore();X.beginPath();X.arc(hx,hz2,4.8,0,7);P(L.s,2);
+if(sh){X.beginPath();X.arc(22,-44,17,0,7);P(c,3);X.strokeStyle=G;X.lineWidth=2;X.beginPath();X.arc(22,-44,10,0,7);X.stroke();X.fillStyle=G;X.beginPath();X.arc(22,-44,3.5,0,7);X.fill()}
+X.restore()}
+function ridge(o,a,col,sp){X.fillStyle=col;X.beginPath();X.moveTo(0,hz);for(let x=0;x<=VW+12;x+=12)X.lineTo(x,hz-a*(.55+.3*Math.sin(x*.007+o+tm*sp)+.15*Math.sin(x*.021+o*2)));X.lineTo(VW+12,hz);X.fill()}
+function burst(x,y,c,n){for(let i=0;i<n;i++){const a=Math.random()*6.3,v=60+R(240);PT.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-40,l:1,c,s:4,g:300})}}
+function hit(a,d,c,n,big){a.hp=Math.max(0,a.hp-d);shake=big?22:12;const x=a.bx+a.x,y=gy-60*sc;burst(x,y,c,n);FL.push({x,y:y-50*sc,t:d?'-'+d:'Miss',c,l:1});sfx(d?150:400,.3,'square')}
+function shoot(a,e,c){return new Promise(r=>PJ.push({x0:a.bx+a.x+50*sc,y0:gy-70*sc+a.y,x1:e.bx+e.x,y1:gy-60*sc,t0:performance.now(),T:340,c,cb:r}))}
+function drawA(a,f,t){const ms=a.n=='Six Maharathis'?[-1,0,1]:[0],z=sc*(ms.length>1?.8:1);
+ms.forEach(m=>fig(a.bx+a.x+m*40*sc,gy+a.y+Math.sin(t/350+m)*3,z,a.c,f,t,a.w,a.al,a.aura||a.sh,a.sh,a.n,Math.min(1,Math.abs(a.x)/(30*sc)),Math.min(1,-a.y/(VH*.1))));
+if(a.aura){X.strokeStyle=a.c;X.lineWidth=3;for(let i=0;i<3;i++){X.globalAlpha=.6-i*.18;X.beginPath();X.arc(a.bx+a.x,gy+a.y-55*sc,(40+i*18+(t/8%20))*sc,0,7);X.stroke()}X.globalAlpha=1}
+const cx=a.bx+a.x,by=gy-135*sc;X.fillStyle='rgba(0,0,0,.6)';X.fillRect(cx-55,by,110,8);X.fillStyle=a.dp/a.mx>.3?a.c:'#e03a3a';X.fillRect(cx-55,by,110*Math.max(0,a.dp/a.mx),8);
+X.font='600 14px Georgia,serif';X.textAlign='center';X.fillStyle='#ffe2a0';X.globalAlpha=a.al;X.fillText(a.n,cx,by-6);X.globalAlpha=1}
+function frame(t){const dt=Math.min(.05,(t-tm)/1000||0);tm=t;const c=s?Math.min(s.c,5):0,T=SKY[c];
+for(let i=0;i<6;i++)sk[i]+=(T[i]-sk[i])*.03;sy+=(SY[c]*VH-sy)*.03;
+X.save();if(shake>.3){X.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.88}
+let g=X.createLinearGradient(0,0,0,hz);g.addColorStop(0,`rgb(${sk[0]|0},${sk[1]|0},${sk[2]|0})`);g.addColorStop(1,`rgb(${sk[3]|0},${sk[4]|0},${sk[5]|0})`);X.fillStyle=g;X.fillRect(-30,-30,VW+60,VH+60);
+if(c>=4)ST.forEach(q=>{X.fillStyle=`rgba(255,255,255,${.3+.4*Math.sin(t/500+q[2])})`;X.fillRect(q[0]*VW,q[1]*VH,2,2)});
+const sx=VW*(.18+.13*c),sY=hz-sy,sl=c==5?'223,230,255':'255,210,122';g=X.createRadialGradient(sx,sY,4,sx,sY,VH*.25);g.addColorStop(0,`rgba(${sl},1)`);g.addColorStop(.15,`rgba(${sl},.5)`);g.addColorStop(1,`rgba(${sl},0)`);X.fillStyle=g;X.fillRect(sx-VH*.3,sY-VH*.3,VH*.6,VH*.6);
+ridge(1,VH*.14,'rgba(40,28,66,.6)',.00004);ridge(4,VH*.08,'rgba(16,12,34,.9)',.00007);
+g=X.createLinearGradient(0,hz,0,VH);g.addColorStop(0,'#1a1328');g.addColorStop(1,'#06050d');X.fillStyle=g;X.fillRect(-30,hz,VW+60,VH);
+X.strokeStyle='#0a0814';X.lineWidth=2;for(let x=0;x<VW;x+=15){const hh=22+(x*7%17),sw=Math.sin(t/900+x)*1.5;X.beginPath();X.moveTo(x,hz+6);X.lineTo(x+sw,hz-hh);X.stroke();if(x%105==0){X.fillStyle='#a0303a';X.beginPath();X.moveTo(x+sw,hz-hh);X.lineTo(x+sw+12,hz-hh+4);X.lineTo(x+sw,hz-hh+8);X.fill()}}
+EM.forEach(e=>{e[1]-=dt*.05*e[2];if(e[1]<0)e[1]=1;X.fillStyle='rgba(255,170,80,.6)';X.fillRect(e[0]*VW+Math.sin(t/800+e[0]*9)*10,e[1]*VH,2,2)});
+if(!bt)FY.forEach((f,i)=>{const d=i%2?-1:1,p=(t*(.03+i*.006)+i*VW/5)%(VW+240)-120,px=d>0?p:VW-p,py=VH*(.07+.045*i)+Math.sin(t/700+i)*16,fa=f.fl&&t<f.ft;if(f.fl&&!fa){f.fl=0;f.rt=t+2000}
+const hv=hov==i&&!fa,fd=fa?f.dir:d,tx=fa?(f.dir>0?VW+300:-300):hv?VW*.5:px,ty=fa?f.y-30:hv?VH*.17:py;
+if(!hv&&!fa&&t>(f.rt||0)&&Math.abs(tx-f.x)>VW*.6)f.x=tx;f.x+=(tx-f.x)*(fa?.12:.08);f.y+=(ty-f.y)*.08;f.s+=((hv?1.5:.5)-f.s)*.08;
+if(Math.random()<.5)PT.push({x:f.x-(hv?0:fd)*18*f.s,y:f.y-50*f.s,vx:-fd*25,vy:R(20)-10,l:.8,c:H[i].c,s:2});fig(f.x,f.y,f.s,H[i].c,hv?1:fd,t,H[i].w,.9,1,0,H[i].n,0,0)});
+if(bt&&Z){const P=Z.p,E=Z.e;[P,E].forEach((a,q)=>{a.bx=VW*(q?.75:.25);a.x+=(a.tx-a.x)*.22;a.y+=(a.ty-a.y)*.15;a.al+=(a.ta-a.al)*.08;a.dp+=(a.hp-a.dp)*.1});
+X.fillStyle='rgba(0,0,0,.4)';[P,E].forEach(a=>{X.beginPath();X.ellipse(a.bx+a.x,gy+6,40*sc*Math.max(.2,a.al),8*sc,0,0,7);X.fill()});drawA(P,1,t);drawA(E,-1,t)}
+for(let i=PJ.length-1;i>=0;i--){const p=PJ[i],q=(performance.now()-p.t0)/p.T;if(q>=1){PJ.splice(i,1);p.cb();continue}
+const x=p.x0+(p.x1-p.x0)*q,y=p.y0+(p.y1-p.y0)*q-Math.sin(q*3.14)*40;X.strokeStyle=p.c;X.lineWidth=4;X.shadowColor=p.c;X.shadowBlur=18;X.beginPath();X.moveTo(x-(p.x1-p.x0)*.08,y-(p.y1-p.y0)*.08);X.lineTo(x,y);X.stroke();X.shadowBlur=0;PT.push({x,y,vx:R(40)-20,vy:R(40)-20,l:.5,c:p.c,s:3})}
+for(let i=PT.length-1;i>=0;i--){const p=PT[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=(p.g||0)*dt;p.l-=dt*1.4;if(p.l<=0){PT.splice(i,1);continue}X.globalAlpha=p.l;X.fillStyle=p.c;X.beginPath();X.arc(p.x,p.y,p.s*p.l+1,0,7);X.fill()}X.globalAlpha=1;
+X.font='bold 26px Georgia,serif';X.textAlign='center';for(let i=FL.length-1;i>=0;i--){const f=FL[i];f.y-=dt*50;f.l-=dt*.9;if(f.l<=0){FL.splice(i,1);continue}X.globalAlpha=f.l;X.fillStyle=f.c;X.fillText(f.t,f.x,f.y)}X.globalAlpha=1;
+X.restore();requestAnimationFrame(frame)}
+function hd(){const d=CH[s.c][0];let x='';for(let i=1;i<=18;i++)x+=`<i class="${i<d?'p':i==d?'n':''}"></i>`;return`<div class="d" role="img" aria-label="Day ${d} of 18">${x}</div><div class="sp m"><span>${h.n}</span><span>Dharma ${s.dh} \u00b7 Honour ${s.yh} \u00b7 Loyalty ${s.lo}</span></div>`}
+function title(){bt=0;hov=-1;$(`<div class="p"><h1>Kurukshetra: The Eighteen Days</h1><p>Choose a warrior and live the war from their side. Every choice you make weighs on your dharma.</p><button onclick="sfx(200,1.4,'sine',.15);sel()">Choose your warrior</button><p class="m">Tap the sky to fire an astra.</p></div>`)}
+function sel(){bt=0;$(`<div class="p"><h2>Who will you be?</h2><p class="m">Hover over a warrior to see them take flight.</p><div class="g">${H.map((x,i)=>`<button class="c" style="--k:${x.c}" onpointerenter="hov=${i}" onpointerleave="hov=-1" onfocus="hov=${i}" onblur="hov=-1" onclick="pick(${i})"><b style="color:${x.c}">${x.n}</b><br><small>${x.s=='P'?'Pandava side':'Kaurava side'}</small><p>${x.p}</p><small>Health ${x.hp} \u00b7 Attack ${x.atk} \u00b7 ${x.a[0]}</small></button>`).join('')}</div></div>`)}
+function pick(i){hov=-1;h=H[i];k=h.k;s={hp:h.hp,dh:50,yh:50,lo:50,c:0,buf:0,g:0,vb:0,bn:0,w:0};sfx(200,1,'sine',.12);pre(0)}
+function pre(i){const p=PR[i];$(`<div class="p"><small class="m">How the war came (${i+1} of 5)</small><h2>${p[0]}</h2><p>${p[1]}</p><button onclick="${i<4?`pre(${i+1})`:'brief()'}">${i<4?'Continue':'March to Kurukshetra'}</button></div>`)}
+function en(){if(gl(k)){const g=GA[s.g];return{n:g[0],hp:g[1],mx:g[1],atk:g[2]}}const n=h.s=='P'?EP[s.c]:EK[s.c];return{n,hp:ES[s.c][0],mx:ES[s.c][0],atk:ES[s.c][1]}}
+function brief(){bt=0;s.g=0;const c=CH[s.c];let x=`<div class="p" style="margin-top:8vh">${hd()}<h2>Day ${c[0]}: ${c[1]}</h2><p>${c[2]}</p>`;
+if(s.c==0)return $(x+opts()+'</div>');
+$(x+(gl(k)?`<p>This day is a gauntlet of four duels: <b>${GA.map(g=>g[0]).join(', ')}</b>. You recover 8 health between duels.</p><p>You face <b>${en().n}</b> first. Choose your formation:</p>`:`<p>You face <b>${en().n}</b>. Choose your formation:</p>`)+V.map((v,i)=>`<button class="o" onclick="fight(${i})"><b>${v[0]}</b> <small>${v[1]}</small></button>`).join('')+'</div>')}
+const mk=(n,c,w,hp,mx)=>({n,c,w,hp,mx,dp:hp,x:0,y:0,tx:0,ty:0,al:1,ta:1,sh:0,aura:0,bx:0});
+function fight(v){s.buf=v==1?2:0;if(v==0)s.hp=Math.min(h.hp,s.hp+10);duel(v==2?1:0,'The conches sound. The duel begins.')}
+function duel(c0,l){b={e:en(),c:c0,t:0,i:'strike',l};b.lk=gl(k)&&b.e.n=='Shikhandi'&&!s.vb;
+Z={p:mk(h.n,h.c,h.w,s.hp,h.hp),e:mk(b.e.n,CO[b.e.n]||'#aaa',/Bhima|Duryodhana/.test(b.e.n)?'m':'b',b.e.hp,b.e.mx)};bt=1;busy=0;sfx(180,1.2,'sine',.12);nx();draw()}
+function brk(){if(busy)return;s.vb=1;b.lk=0;s.dh=cl(s.dh-15);s.yh=cl(s.yh-10);b.l='You break your vow. Your dharma is stained, but you will not be pierced by his arrows today.';draw()}
+function nx(){const r=Math.random();b.i=r<.5?'strike':r<.8?'heavy':'guard'}
+function draw(){const e=b.e,A=h.a;$(`<div style="height:36vh"></div><div class="p">${hd()}<p class="m">${e.n} ${IT[b.i]}. Astra ${Math.min(b.c,A[2])}/${A[2]} \u00b7 Health ${s.hp}/${h.hp}</p><p class="l">${b.l}</p>`+(b.lk?`<p class="m">Your vow forbids raising a weapon against him. Endure four exchanges, or break the vow and fight.</p><button class="o" style="width:auto;display:inline-block" onclick="brk()">Break the vow</button>`:`<button onclick="act('s')">Strike</button>`)+`<button onclick="act('g')">Guard</button>`+(b.lk?'':`<button onclick="act('a')" ${b.c>=A[2]?'':'disabled'}>${A[0]}</button><button class="o" style="width:auto;display:inline-block" onclick="act('f')">Foul blow</button>`)+`</div>`)}
+function calc(a){const e=b.e,A=h.a;let d=0,x=0,l=[],att=0;
+const at=h.atk+s.buf+(k=='rage'&&s.hp<h.hp/2?3:0)+(k=='mace'?2:0)+(k=='fear'?2:0);
+if(a=='s'){d=at+R(4);if(Math.random()<.15){d=Math.round(d*1.6);l.push(`Critical strike for ${d}!`)}else l.push(`You strike for ${d}.`)}
+if(a=='g'){b.c+=k=='gc'?2:1;l.push('You guard and gather strength.')}
+if(a=='a'){if(k=='curse'&&s.hp<h.hp*.35&&Math.random()<.5)l.push('The curse! Your astra fizzles.');else{d=A[1];l.push(`${A[0]} strikes for ${d}!`)}b.c=0}
+if(a=='f'){d=at*2+R(4);s.dh=cl(s.dh-12);s.yh=cl(s.yh-8);l.push(`A foul blow for ${d}. Your dharma is stained.`)}
+if(b.i=='guard'&&a!='f'&&d){d=Math.round(d/2);l.push('He guards; half the force is lost.')}
+e.hp-=d;b.t++;const i=b.i;
+if(e.hp>0){att=1;x=i=='strike'?e.atk+R(3):i=='heavy'?Math.round(e.atk*1.8):0;if(a=='g')x=Math.round(x*(k=='fear'?.7:.4));if(k=='curse')x=Math.round(x*1.2);s.hp-=x;if(x)l.push(`${e.n} hits you for ${x}.`);if(k=='lock'&&s.hp<=0&&!s.bn&&!b.lk){s.bn=1;s.hp=8;l.push('Your boon of chosen death holds. You rise again with 8 health.')}}
+return{d,x,i,att,l}}
+async function play(a,r){const P=Z.p,E=Z.e,D=VW*.5-75*sc;P.sh=0;E.sh=0;
+if(a=='g'){P.sh=1;sfx(300,.3,'sine');await wt(380)}
+else if(a=='s'||a=='f'){P.tx=D;sfx(a=='f'?120:220,.25);await wt(240);hit(P===Z.p?E:P,r.d,a=='f'?'#ff3b3b':'#ffd36b',18,a=='f');P.tx=0;await wt(240)}
+else{P.ty=-VH*.14;P.aura=1;sfx(500,.6,'sine');await wt(450);await shoot(P,E,h.c);hit(E,r.d,h.c,36,1);P.aura=0;P.ty=0;await wt(280)}
+if(r.att){if(r.i=='strike'){E.tx=-D;sfx(180,.25);await wt(240);hit(P,r.x,'#ffb0b0',14);E.tx=0;await wt(240)}
+else if(r.i=='heavy'){E.ty=-VH*.15;await wt(320);E.tx=-D;E.ty=0;await wt(200);hit(P,r.x,'#ff5050',30,1);E.tx=0;await wt(260)}
+else{E.sh=1;await wt(420)}}
+if(s.hp<=0){P.ty=-VH*.3;P.ta=0;await wt(800)}if(b.e.hp<=0){E.ty=-VH*.3;E.ta=0;await wt(800)}}
+async function act(a){if(busy)return;busy=1;document.querySelectorAll('#a button').forEach(x=>x.disabled=true);const r=calc(a);b.l=r.l.join(' ');await play(a,r);busy=0;
+if(s.hp<=0)return end('dead');if(b.e.hp<=0||(b.lk&&b.t>=4))return win();nx();draw()}
+function nd(){duel(0,'The next challenger steps forward.')}
+function win(){bt=0;s.yh=cl(s.yh+6);s.w++;
+if(gl(k)&&s.g<3){s.g++;s.hp=Math.min(h.hp,s.hp+8);sfx(400,.8,'triangle',.1);const n=GA[s.g][0];return $(`<div class="p" style="margin-top:8vh">${hd()}<h2>Duel ${s.g} of 4 won</h2><p>${b.l}</p><p class="m">You catch your breath and recover 8 health. Next: <b>${n}</b>.</p><button onclick="nd()">Face ${n}</button></div>`)}
+if(h.f==s.c&&!s.vb)return end('fate');sfx(400,.8,'triangle',.1);$(`<div class="p" style="margin-top:8vh">${hd()}<h2>Victory on Day ${CH[s.c][0]}</h2><p>${b.l}</p><button onclick="camp()">Return to camp</button></div>`)}
+function opts(){return`<p class="m">Night falls. What do you decide?</p>`+CH[s.c][3].map((o,i)=>`<button class="o" onclick="ch(${i})">${o[0]}</button>`).join('')}
+function camp(){const c=CH[s.c];$(`<div class="p" style="margin-top:8vh">${hd()}<h2>Night after Day ${c[0]}</h2><p>The fires burn low.</p>${opts()}</div>`)}
+function ch(i){const o=CH[s.c][3][i];s.dh=cl(s.dh+o[1]);s.yh=cl(s.yh+o[2]);s.lo=cl(s.lo+o[3]);s.hp=Math.min(h.hp,s.hp+o[4]+6);s.c++;if(s.c>5)return end('win');brief()}
+function end(t){bt=0;const d=CH[Math.min(s.c,5)][0],ep=s.dh>=70?'You are remembered as a keeper of dharma.':s.dh>=40?'You are remembered as a warrior of your age, praised and questioned.':'You are remembered for victories bought with adharma.';
+const m=t=='dead'?`You fell on the field on Day ${d}. The war moves on without you.`:t=='fate'?h.ft:'The guns of war fall silent. Eighteen days have ended a world.';
+$(`<div class="p" style="margin-top:8vh"><h1>${t=='win'?'The war is over':'Your war ends'}</h1><p>${m}</p><p><b>${ep}</b></p><p class="m">Dharma ${s.dh} \u00b7 Honour ${s.yh} \u00b7 Loyalty ${s.lo} \u00b7 Duels won ${s.w}</p><button onclick="sel()">Play another warrior</button></div>`)}
+addEventListener('resize',resize);
+document.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const c=H[R(6)].c,x=e.clientX,y=e.clientY;PJ.push({x0:R(VW),y0:VH,x1:x,y1:y,t0:performance.now(),T:450,c,cb:()=>{burst(x,y,c,30);sfx(260,.3,'triangle');scare(x,y)}})});
+function scare(x,y){if(bt)return;FY.forEach(f=>{if(f.fl)return;const dx=f.x-x,dy=f.y-50*f.s-y;if(dx*dx+dy*dy<22500){f.fl=1;f.dir=dx<0?-1:1;f.ft=performance.now()+2800;FL.push({x:f.x,y:f.y-120*f.s,t:'!',c:'#ffe2a0',l:1})}})}
+resize();title();requestAnimationFrame(frame);
+</script></body></html>
