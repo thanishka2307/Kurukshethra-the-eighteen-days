@@ -2,9 +2,7 @@ Kurukshetra: The Eighteen Days
 
 A cartoon-style game that brings the Mahabharata war to life.
 
-The Mahabharata is an epic of duty, loyalty and difficult choices, and its war at Kurukshetra lasted eighteen days. This project turns that war into an interactive game: pick a warrior and live the war from their side.
-
-Play it online: https://thanishka2307.github.io/Kurukshethra-the-eighteen-days/
+The Mahabharata is an epic of duty, loyalty and difficult choices, and its war at Kurukshetra lasted eighteen days. This project turns that war into an interactive game: pick a warrior and live the war from their side
 
 Features
 18 days of war shown on a day-by-day tracker
